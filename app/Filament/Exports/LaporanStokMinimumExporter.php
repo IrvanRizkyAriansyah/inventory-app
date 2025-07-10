@@ -3,38 +3,38 @@
 namespace App\Filament\Exports;
 
 use App\Models\BahanBaku;
-use App\Models\LaporanStokBahan;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 
-class LaporanStokBahanExporter extends Exporter
+class LaporanStokMinimumExporter extends Exporter
 {
     protected static ?string $model = BahanBaku::class;
 
     public static function getColumns(): array
     {
         return [
-            //
-            ExportColumn::make('kode_bahan_baku')->label('Kode Bahan Baku'),
+            ExportColumn::make('kode_bahan_baku')->label('Kode'),
             ExportColumn::make('nama_bahan_baku')->label('Nama Bahan'),
-            ExportColumn::make('kategori.nama_kategori')->label('Kategori'),
-            ExportColumn::make('satuan.nama_satuan')->label('Satuan'),
             ExportColumn::make('stok')->label('Stok Saat Ini'),
             ExportColumn::make('stok_minimum')->label('Stok Minimum'),
+            ExportColumn::make('satuan.nama_satuan')->label('Satuan'),
             ExportColumn::make('suplier.nama_suplier')->label('Suplier'),
-            ExportColumn::make('status')->label('Status')->getStateUsing(function ($record) {
-                return $record->stok < $record->stok_minimum ? 'Perlu Restock' : 'Cukup';
+            ExportColumn::make('selisih')->label('Selisih')->getStateUsing(function ($record) {
+                return $record->stok - $record->stok_minimum;
             }),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your laporan stok bahan export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Laporan stok minimum berhasil diekspor. '
+              . number_format($export->successful_rows) . ' '
+              . str('baris')->plural($export->successful_rows) . ' berhasil.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+            $body .= ' ' . number_format($failedRowsCount) . ' '
+                   . str('baris')->plural($failedRowsCount) . ' gagal diekspor.';
         }
 
         return $body;

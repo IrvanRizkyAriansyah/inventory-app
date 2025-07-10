@@ -17,8 +17,7 @@ class PengeluaranChart extends ChartWidget
     protected function getData(): array
     {
         $query = PengeluaranDetail::query()
-            ->join('pengeluarans', 'pengeluarans.id', '=', 'pengeluaran_details.pengeluaran_id')
-            ->join('bahan_bakus', 'bahan_bakus.id', '=', 'pengeluaran_details.bahan_baku_id');
+        ->join('pengeluarans', 'pengeluarans.id', '=', 'pengeluaran_details.pengeluaran_id');
 
         $startDate = $this->filters['startDate'] ?? null;
         $endDate = $this->filters['endDate'] ?? null;
@@ -31,11 +30,12 @@ class PengeluaranChart extends ChartWidget
             $query->whereDate('pengeluarans.tanggal_pengeluaran', '<=', $endDate);
         }
 
+
         $data = $query
-            ->selectRaw('MONTH(pengeluarans.tanggal_pengeluaran) as bulan, SUM(pengeluaran_details.qty * bahan_bakus.harga_satuan) as total')
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->pluck('total', 'bulan');
+        ->selectRaw('MONTH(pengeluarans.tanggal_pengeluaran) as bulan, SUM(pengeluaran_details.qty) as total')
+        ->groupBy('bulan')
+        ->orderBy('bulan')
+        ->pluck('total', 'bulan');
 
         $labels = [];
         $values = [];
@@ -48,7 +48,7 @@ class PengeluaranChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Total Pengeluaran (Rp)',
+                    'label' => 'Total Pengeluaran',
                     'data' => $values,
                     'borderColor' => '#f97316', // orange
                     'backgroundColor' => 'rgba(249, 115, 22, 0.2)', // translucent fill

@@ -49,7 +49,8 @@ class PengeluaranResource extends Resource
                         ->relationship('bahanBaku', 'nama_bahan_baku')
                         ->searchable()
                         ->preload()
-                        ->required(),
+                        ->required()
+                        ->reactive(),
 
                     TextInput::make('qty')
                         ->label('Jumlah Keluar')
@@ -74,6 +75,11 @@ class PengeluaranResource extends Resource
                         })
                         ->helperText(function (callable $get) {
                             $bahanBakuId = $get('bahan_baku_id');
+
+                            if (!$bahanBakuId) {
+                                return null; // Jangan tampilkan helper jika belum memilih bahan baku
+                            }
+
                             $stok = \App\Models\BahanBaku::find($bahanBakuId)?->stok ?? 0;
 
                             return "Stok tersedia: $stok";

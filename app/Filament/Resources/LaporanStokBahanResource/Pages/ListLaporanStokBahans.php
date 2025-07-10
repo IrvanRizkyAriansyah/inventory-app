@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\LaporanStokBahanResource\Pages;
 
+use App\Filament\Exports\LaporanStokBahanExporter;
 use App\Filament\Resources\LaporanStokBahanResource;
 use Filament\Actions;
+use Filament\Actions\ExportAction;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Resources\Pages\ListRecords;
 
 class ListLaporanStokBahans extends ListRecords
@@ -14,6 +17,12 @@ class ListLaporanStokBahans extends ListRecords
     {
         return [
             // Actions\CreateAction::make(),
+            ExportAction::make()
+            ->exporter(LaporanStokBahanExporter::class)
+            ->formats([
+                ExportFormat::Xlsx,
+            ])
+            ->label('Ekspor laporan stok bahan')
         ];
     }
 }

@@ -34,7 +34,8 @@ class StatsOverview extends BaseWidget
         if ($endDate) {
             $penerimaanQuery->whereDate('tanggal_terima', '<=', $endDate);
         }
-        $totalPenerimaan = Penerimaan::count();
+        $totalPenerimaan = $penerimaanQuery->count();
+;
 
         // Total Pengeluaran sesuai filter
         $pengeluaranQuery = PengeluaranDetail::query()
@@ -48,7 +49,7 @@ class StatsOverview extends BaseWidget
             });
         
         $totalPengeluaran = $pengeluaranQuery->get()->sum(function ($item) {
-            return ($item->bahanBaku?->harga_satuan ?? 0) * $item->qty;
+            return $item->qty;
         });
 
         // Total Supplier (tidak perlu filter)
@@ -75,7 +76,7 @@ class StatsOverview extends BaseWidget
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success'),
 
-            Stat::make('Pengeluaran', 'Rp ' . number_format($totalPengeluaran, 0, ',', '.'))
+            Stat::make('Pengeluaran', number_format($totalPengeluaran, 0, ',', '.'))
                 ->description('Estimasi bahan keluar')
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('warning'),
